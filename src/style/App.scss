@@ -4,6 +4,10 @@
     font-size: 16px;
 }
 
+* {
+    box-sizing: border-box;
+}
+
 .app-container {
     display: flex;
     flex-direction: column;
@@ -13,6 +17,7 @@
     background: #12c2e9; /* fallback for old browsers */
     background: linear-gradient(to left, #f64f59, #c471ed, #12c2e9);
     overflow: hidden;
+    padding: 10px;
 }
 
 .joke-container {
@@ -24,8 +29,8 @@
     .joke {
         background-color: white;
         width: fit-content;
-        max-width: 720px;
-        min-width: 400px;
+        max-width: 100%;
+        min-width: 300px;
         padding: 16px 20px;
         border-radius: 6px;
         height: fit-content;
@@ -33,9 +38,9 @@
         box-shadow: 0px 6px 24px -10px rgba(0, 0, 0, 0.31);
         margin: 0;
 
-        @include mobile {
-            max-width: 82vw;
-            min-width: 350px;
+        @include desktop {
+            // max-width: 720px;
+            // min-width: 400px;
         }
 
         .joke--text {
@@ -69,16 +74,18 @@
 
     .alert-icon {
         color: rgb(221, 45, 45);
+        font-size: 1.2em;
     }
-}
 
-.error-show {
-    bottom: 22.5vh;
-    opacity: 1;
-}
-.error-hide {
-    bottom: 10px;
-    opacity: 0;
+    &.error-show {
+        top: 18px;
+        opacity: 1;
+    }
+
+    &.error-hide {
+        top: 0;
+        opacity: 0;
+    }
 }
 
 form {
@@ -89,7 +96,6 @@ form {
     box-shadow: 0px 6px 24px -10px rgba(0, 0, 0, 0.31);
     margin-bottom: 10px;
     font-size: 0.88em;
-    // color: white;
 }
 
 .options-container {

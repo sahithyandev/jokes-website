@@ -1,4 +1,4 @@
-import React, { useEffect, useState, MouseEvent } from 'react';
+import React, { useEffect, useState } from 'react';
 import { GoAlert } from 'react-icons/go'
 import { useFormik } from 'formik';
 import { getJokes, category as Category, flag as Flag, requestOptions } from "sv443-joke-api";
