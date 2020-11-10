@@ -1,0 +1,12 @@
+body {
+    margin: 0;
+    font-family: "Roboto";
+    height: 100vh;
+}
+
+input[type="checkbox"] {
+    cursor: pointer;
+    & + label {
+        cursor: pointer;
+    }
+}

@@ -1,0 +1,23 @@
+button {
+}
+
+.app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+.joke-container {
+    flex: 1;
+
+    .joke {
+    }
+}
+
+.options-container {
+    background-color: rgb(139, 161, 235);
+    padding: 20px;
+
+    h2 {
+        margin-top: 0;
+    }
+}
