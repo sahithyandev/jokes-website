@@ -1,19 +1,26 @@
 // types and values needed by this app
-import { category as Category, flag as Flag } from "sv443-joke-api";
+import {
+    Category,
+    Flag,
+    AVAILABLE_CATEGORIES,
+    AVAILABLE_FLAGS,
+} from "sv443-joke-api";
+
+export const capitalize = (str: string): string =>
+    str[0].toUpperCase() + str.slice(1).toLowerCase();
 
 export const AVAILABLE: {
     category: Category[];
     flag: string[];
 } = {
-    category: [
-        "Programming",
-        "Miscellaneous",
-        "Dark",
-        "Pun",
-        "Spooky",
-        "Christmas",
-    ],
-    flag: ["NSFW", "Religious", "Political", "Sexist"],
+    category: AVAILABLE_CATEGORIES as Category[],
+    flag: AVAILABLE_FLAGS.map(capitalize).map((flag) => {
+        const specials = {
+            Nsfw: "NSFW",
+        };
+        // @ts-ignore
+        return Object.keys(specials).includes(flag) ? specials[flag] : flag;
+    }),
 };
 
 export type JokeObject = {
@@ -39,6 +46,3 @@ export type Error = {
     additionalInfo: string;
     timestamp: number;
 };
-
-export const capitalize = (str: string) =>
-    str[0].toUpperCase() + str.slice(1).toLowerCase();
