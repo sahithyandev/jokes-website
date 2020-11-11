@@ -39,8 +39,8 @@
         margin: 0;
 
         @include desktop {
-            // max-width: 720px;
-            // min-width: 400px;
+            max-width: 800px;
+            min-width: 600px;
         }
 
         .joke--text {
@@ -53,11 +53,16 @@
                 width: 100%;
             }
         }
-        .joke--tag {
-            background-color: rgba(202, 202, 202, 0.774);
-            padding: 4px 6px;
-            border-radius: 4px;
-            font-size: 0.9em;
+        .joke--tags-container {
+            display: flex;
+            gap: 10px;
+
+            .joke--tag {
+                background-color: rgba(202, 202, 202, 0.774);
+                padding: 4px 6px;
+                border-radius: 4px;
+                font-size: 0.9em;
+            }
         }
     }
 }

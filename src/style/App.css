@@ -61,6 +61,13 @@
   margin: 0;
 }
 
+@media (min-width: 700px) {
+  .joke-container .joke {
+    max-width: 800px;
+    min-width: 600px;
+  }
+}
+
 .joke-container .joke .joke--text {
   color: #050609;
   width: 88%;
@@ -74,7 +81,14 @@
   }
 }
 
-.joke-container .joke .joke--tag {
+.joke-container .joke .joke--tags-container {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  gap: 10px;
+}
+
+.joke-container .joke .joke--tags-container .joke--tag {
   background-color: rgba(202, 202, 202, 0.774);
   padding: 4px 6px;
   border-radius: 4px;

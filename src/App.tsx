@@ -2,36 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { GoAlert } from 'react-icons/go'
 import { useFormik } from 'formik';
 import { getJokes, category as Category, flag as Flag, requestOptions } from "sv443-joke-api";
+import { Error, JokeObject, FormValues, AVAILABLE, capitalize } from './extras';
 import './style/App.css';
 
-const AVAILABLE_CATEGORIES: Category[] = ["Programming", "Miscellaneous", "Dark", "Pun", "Spooky", "Christmas"]
-const AVAILABLE_FLAGS = ["NSFW", "Religious", "Political", "Sexist"]
-
-type SinglePartJoke = {
-  content: string,
-  category: Category | ''
-}
-type FormValues = {
-  // TK convert it to Category
-  categories: Set<Category>,
-  // TK convert it to Flag
-  flags: Set<Flag>,
-  searchString: string
-}
-
-type Error = {
-  error: Boolean,
-  internalError: Boolean,
-  code: number,
-  message: string,
-  causedBy: string[],
-  additionalInfo: string,
-  timestamp: number
-}
-
-// TK Make it work.
 function App() {
-  const [joke, setJoke] = useState<SinglePartJoke>({
+  const [joke, setJoke] = useState<JokeObject>({
+    type: '',
     content: '',
     category: ''
   })
@@ -47,17 +23,19 @@ function App() {
   const formik = useFormik<FormValues>({
     initialValues: {
       searchString: '',
-      categories: new Set(),
-      flags: new Set()
+      categoryArray: new Set(),
+      flagArray: new Set()
     },
     onSubmit: (values) => {
-      loadJoke()
+      loadJokes()
     }
   })
 
-  const updateCheckboxValues = (type: 'categories' | 'flags', value: Flag | Category) => {
-    let n = new Set(Array.from(formik.values[type]))
-    //@ts-ignore
+  const updateCheckboxValues = (_type: 'category' | 'flag', value: Flag | Category) => {
+    console.log('CAAA')
+    let type = _type + 'Array' as 'categoryArray' | 'flagArray'
+    let n = new Set(Array.from(formik.values[type])) // copying the set
+    // @ts-ignore
     if (formik.values[type].has(value)) {
       n.delete(value);
     } else {
@@ -68,42 +46,55 @@ function App() {
       ...formik.values,
       [type]: n
     })
+    console.log({ type, n, values: formik.values })
   }
 
-  const loadJoke = () => {
-    let v = formik.values
+  const getFlags = (joke: { flags: { [s: string]: boolean } }) => {
+    return Object.entries(joke.flags)
+      .filter(([_, v]) => v)
+      .map(([key, _]) => key)
+      .map(capitalize)
+      .map(v => v === 'Nsfw' ? 'NSFW' : v)
+  }
+
+  const loadJokes = () => {
+    const v = formik.values
     let options: requestOptions = {
       idRange: {
         to: 257
-      },
-      jokeType: 'single'
+      }
     }
     if (v.searchString !== '') options.searchString = v.searchString
-    if (v.flags.size !== 0) options.flags = Array.from(v.flags)
-    if (v.categories.size !== 0) options.categories = Array.from(v.categories)
+    options.flags = Array.from(v.flagArray)
+    if (v.categoryArray.size !== 0) options.categories = Array.from(v.categoryArray)
 
     console.log(options);
 
-    getJokes(options).then(res => res.json()).then(d => {
-      console.log(d)
-      if (!d.error) {
-        setJoke({
-          content: d.joke,
-          category: d.category as Category
-        })
-        setError({
-          ...error,
-          error: false
-        })
-      } else {
-        setError(d)
-      }
-    });
+    getJokes(options).then(res => res.json())
+      .then(jokeData => {
+        console.log(jokeData)
+        if (!jokeData.error) {
+          setJoke({
+            type: jokeData.type,
+            content: jokeData.joke,
+            setup: jokeData.setup,
+            delivery: jokeData.delivery,
+            category: jokeData.category as Category,
+            flags: getFlags(jokeData)
+          })
+          setError({
+            ...error,
+            error: false
+          })
+        } else {
+          setError(jokeData)
+        }
+      });
   }
 
   useEffect(() => {
     console.log('aaaa');
-    loadJoke()
+    loadJokes()
   }, [])
 
   return (
@@ -111,9 +102,21 @@ function App() {
 
       <div className="joke-container">
         <div className="joke">
-          <h2 className="joke--text">{joke.content}</h2>
+          {
+            joke.type === 'single' ?
+              <h2 className="joke--text">{joke.content}</h2>
+              : <div>
+                <h2 className="joke--text">{joke.setup}</h2>
+                <h2 className="joke--text">{joke.delivery}</h2>
+              </div>
+          }
 
-          <span className="joke--tag">{joke.category}</span>
+          <div className="joke--tags-container">
+            <span className="joke--tag">{joke.category}</span>
+            {joke.flags?.map(flag =>
+              <span className="joke--tag" key="flag">{flag}</span>
+            )}
+          </div>
         </div>
       </div>
 
@@ -129,44 +132,33 @@ function App() {
             </div>
 
             {/* TK Dynamically generate these options from one code */}
-            <div className="option">
-              {AVAILABLE_CATEGORIES.map(category => {
-                return (
-                  <span key={category.toLowerCase()}>
-                    <input
-                      type="checkbox"
-                      name="category"
-                      value={category}
-                      checked={formik.values.categories.has(category as Category)}
-                      id={category.toLowerCase()}
-                      onChange={(ev: any) => {
-                        updateCheckboxValues.call(ev, 'categories', category)
-                      }}
-                    />
-                    <label htmlFor={category.toLowerCase()}>{category}</label>
-                  </span>
-                )
-              })}
-            </div>
-            <div className="option">
-              {AVAILABLE_FLAGS.map(flag => {
-                return (
-                  <span key={flag.toLowerCase()}>
-                    <input
-                      type="checkbox"
-                      name="flag"
-                      value={flag}
-                      checked={formik.values.flags.has(flag.toLowerCase() as Flag)}
-                      id={flag.toLowerCase()}
-                      onChange={(ev: any) => {
-                        updateCheckboxValues.call(ev, 'flags', flag.toLowerCase() as Flag)
-                      }}
-                    />
-                    <label htmlFor={flag.toLowerCase()}>{flag}</label>
-                  </span>
-                )
-              })}
-            </div>
+
+            {['category', 'flag'].map(type => {
+              return (<div key={type} className="option">
+                {/* @ts-ignore */}
+                {AVAILABLE[type].map(item => {
+                  return (
+                    <span key={item.toLowerCase()}>
+                      <input
+                        type="checkbox"
+                        name={type}
+                        value={item}
+                        // @ts-ignore
+                        checked={formik.values[type + 'Array'].has(item)}
+                        id={item.toLowerCase()}
+                        onChange={(ev: any) => {
+                          console.log('SS')
+                          // @ts-ignore
+                          updateCheckboxValues.call(ev, type, item)
+                        }}
+                      />
+                      <label htmlFor={item.toLowerCase()}>{item}</label>
+                    </span>
+                  )
+                })}
+              </div>
+              )
+            })}
           </div>
           <button type="submit" className="submit-button">
             Get Another Joke
