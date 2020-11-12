@@ -14,7 +14,7 @@ export const AVAILABLE: {
     flag: string[];
 } = {
     category: AVAILABLE_CATEGORIES as Category[],
-    flag: AVAILABLE_FLAGS.map(capitalize).map((flag) => {
+    flag: AVAILABLE_FLAGS?.map(capitalize).map((flag) => {
         const specials = {
             Nsfw: "NSFW",
         };

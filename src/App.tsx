@@ -70,7 +70,7 @@ function App() {
 
     console.log(options);
 
-    getJokes(options).then((res: Response) => res.json())
+    getJokes(options)!.then((res: Response) => res.json())
       .then((jokeData: any) => {
         console.log(jokeData)
         if (!jokeData.error) {
